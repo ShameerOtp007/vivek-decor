@@ -33,10 +33,14 @@ if (!fs.existsSync(uploadDir)){
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configure Storage (Cloudinary for Prod, Disk for Dev)
+// Configure Storage (Cloudinary if keys exist, Disk otherwise)
 let storage;
 
-if (process.env.NODE_ENV === 'production' || process.env.CLOUDINARY_CLOUD_NAME) {
+const hasCloudinary = process.env.CLOUDINARY_CLOUD_NAME && 
+                      process.env.CLOUDINARY_API_KEY && 
+                      process.env.CLOUDINARY_API_SECRET;
+
+if (hasCloudinary) {
   // Use Cloudinary
   storage = new CloudinaryStorage({
     cloudinary: cloudinary,
@@ -46,7 +50,8 @@ if (process.env.NODE_ENV === 'production' || process.env.CLOUDINARY_CLOUD_NAME) 
     },
   });
 } else {
-  // Use Local Disk
+  // Use Local Disk (Fallback for dev or if Cloudinary vars missing)
+  console.log('Using local disk storage (Cloudinary keys missing)');
   storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, uploadDir)

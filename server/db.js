@@ -55,8 +55,13 @@ export async function getDb() {
         while (query.includes('?')) {
           query = query.replace('?', `$${paramIndex++}`);
         }
-        const result = await pool.query(query, params);
-        return { lastID: result.rows[0]?.id }; // PG RETURNING id
+        try {
+          const result = await pool.query(query, params);
+          return { lastID: result.rows[0]?.id }; // PG RETURNING id
+        } catch (err) {
+          console.error('Database Error:', err);
+          throw err;
+        }
       },
       exec: async (text) => {
         return await pool.query(text);
