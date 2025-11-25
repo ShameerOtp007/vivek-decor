@@ -92,6 +92,10 @@ app.get('/api/masterpieces', async (req, res) => {
 });
 
 app.post('/api/masterpieces', upload.single('image'), async (req, res) => {
+  console.log('Received masterpiece upload request');
+  console.log('Body:', req.body);
+  console.log('File:', req.file);
+
   const { title, category } = req.body;
   
   let imageUrl = '';
@@ -127,6 +131,10 @@ app.get('/api/packages', async (req, res) => {
 });
 
 app.post('/api/packages', upload.single('image'), async (req, res) => {
+  console.log('Received package upload request');
+  console.log('Body:', req.body);
+  console.log('File:', req.file);
+
   const { title, price, description, features } = req.body;
   
   let imageUrl = '';

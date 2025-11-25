@@ -59,7 +59,7 @@ export async function getDb() {
           const result = await pool.query(query, params);
           return { lastID: result.rows[0]?.id }; // PG RETURNING id
         } catch (err) {
-          console.error('Database Error:', err);
+          console.error('Database Error:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
           throw err;
         }
       },
