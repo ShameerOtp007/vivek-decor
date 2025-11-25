@@ -19,7 +19,7 @@ const Packages = () => {
           id: item.id,
           name: item.title,
           price: item.price,
-          image: `${API_URL}${item.image_url}`,
+          image: item.image_url.startsWith('http') ? item.image_url : `${API_URL}${item.image_url}`,
           features: item.features ? item.features.split(',').map(f => f.trim()) : [],
           featured: false
         }));

@@ -24,7 +24,7 @@ const Portfolio = () => {
       .then(data => {
         const formatted = data.map(item => ({
           ...item,
-          image: `${API_URL}${item.image_url}`
+          image: item.image_url.startsWith('http') ? item.image_url : `${API_URL}${item.image_url}`
         }));
         setProjects(formatted);
       })

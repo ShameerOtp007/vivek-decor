@@ -15,29 +15,52 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Ensure uploads directory exists
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+
+// Configure Cloudinary
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+}
+
+// Ensure uploads directory exists for local dev
 const uploadDir = path.join(__dirname, '../public/uploads');
 if (!fs.existsSync(uploadDir)){
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configure Multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir)
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, uniqueSuffix + path.extname(file.originalname))
-  }
-})
+// Configure Storage (Cloudinary for Prod, Disk for Dev)
+let storage;
+
+if (process.env.NODE_ENV === 'production' || process.env.CLOUDINARY_CLOUD_NAME) {
+  // Use Cloudinary
+  storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'vivek-decor',
+      allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+    },
+  });
+} else {
+  // Use Local Disk
+  storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, uploadDir)
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+      cb(null, uniqueSuffix + path.extname(file.originalname))
+    }
+  });
+}
 
 const upload = multer({ storage: storage });
 
-// Serve static files from public/uploads (if not using Vite's public handling for this)
-// In production, you'd serve this via Nginx or similar, or let Vite handle it if built.
-// For now, we rely on Vite serving 'public' folder contents at root.
-// But since we are adding files dynamically, we might need to serve them via express to be sure.
+// Serve static files from public/uploads (Only needed for local dev)
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 
@@ -65,7 +88,12 @@ app.get('/api/masterpieces', async (req, res) => {
 
 app.post('/api/masterpieces', upload.single('image'), async (req, res) => {
   const { title, category } = req.body;
-  const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
+  
+  let imageUrl = '';
+  if (req.file) {
+    // If Cloudinary, path is the full URL. If local, filename needs /uploads/ prefix
+    imageUrl = req.file.path.startsWith('http') ? req.file.path : `/uploads/${req.file.filename}`;
+  }
   
   const db = await getDb();
   const result = await db.run(
@@ -95,7 +123,11 @@ app.get('/api/packages', async (req, res) => {
 
 app.post('/api/packages', upload.single('image'), async (req, res) => {
   const { title, price, description, features } = req.body;
-  const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
+  
+  let imageUrl = '';
+  if (req.file) {
+    imageUrl = req.file.path.startsWith('http') ? req.file.path : `/uploads/${req.file.filename}`;
+  }
   
   const db = await getDb();
   const result = await db.run(

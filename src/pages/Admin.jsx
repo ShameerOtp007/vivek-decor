@@ -172,7 +172,7 @@ const MasterpiecesManager = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {items.map((item) => (
           <div key={item.id} className="bg-card-bg p-4 rounded-lg border border-gray-700">
-            <img src={`${API_URL}${item.image_url}`} alt={item.title} className="w-full h-48 object-cover rounded mb-4" />
+            <img src={item.image_url.startsWith('http') ? item.image_url : `${API_URL}${item.image_url}`} alt={item.title} className="w-full h-48 object-cover rounded mb-4" />
             <h3 className="font-bold text-lg">{item.title}</h3>
             <p className="text-gray-400">{item.category}</p>
             <button onClick={() => handleDelete(item.id)} className="mt-4 text-red-500 hover:text-red-400">
@@ -280,7 +280,7 @@ const PackagesManager = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item) => (
           <div key={item.id} className="bg-card-bg p-4 rounded-lg border border-gray-700">
-            <img src={`${API_URL}${item.image_url}`} alt={item.title} className="w-full h-48 object-cover rounded mb-4" />
+            <img src={item.image_url.startsWith('http') ? item.image_url : `${API_URL}${item.image_url}`} alt={item.title} className="w-full h-48 object-cover rounded mb-4" />
             <h3 className="font-bold text-lg">{item.title}</h3>
             <p className="text-primary font-bold">{item.price}</p>
             <p className="text-gray-400 text-sm mt-2">{item.description}</p>
