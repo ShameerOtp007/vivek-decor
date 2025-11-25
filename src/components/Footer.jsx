@@ -11,6 +11,8 @@ const Footer = () => {
         
         <div className="text-gray-500 text-sm">
           © {new Date().getFullYear()} Vivek Decor. All rights reserved.
+          <span className="mx-2">|</span>
+          <a href="/admin" className="hover:text-primary transition-colors">Admin</a>
         </div>
 
         <div className="flex items-center gap-4">
