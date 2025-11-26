@@ -37,7 +37,7 @@ const Hero = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <h2 className="text-primary text-lg md:text-xl uppercase tracking-[0.3em] mb-4 font-bold">
-            Premium Event Styling
+            
           </h2>
           <h1 className="text-4xl md:text-7xl lg:text-8xl font-heading text-gray-900 mb-6 leading-tight drop-shadow-sm">
             Make Your Events <br />
