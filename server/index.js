@@ -92,71 +92,102 @@ app.get('/api/masterpieces', async (req, res) => {
 });
 
 app.post('/api/masterpieces', upload.single('image'), async (req, res) => {
-  console.log('Received masterpiece upload request');
-  console.log('Body:', req.body);
-  console.log('File:', req.file);
+  try {
+    console.log('Received masterpiece upload request');
+    console.log('Body:', req.body);
+    console.log('File:', req.file);
 
-  const { title, category } = req.body;
-  
-  let imageUrl = '';
-  if (req.file) {
-    // If Cloudinary, path is the full URL. If local, filename needs /uploads/ prefix
-    imageUrl = req.file.path.startsWith('http') ? req.file.path : `/uploads/${req.file.filename}`;
+    const { title, category } = req.body;
+    
+    let imageUrl = '';
+    if (req.file) {
+      // If Cloudinary, path is the full URL. If local, filename needs /uploads/ prefix
+      imageUrl = req.file.path.startsWith('http') ? req.file.path : `/uploads/${req.file.filename}`;
+    }
+    
+    const db = await getDb();
+    const result = await db.run(
+      'INSERT INTO masterpieces (title, category, image_url) VALUES (?, ?, ?) RETURNING id',
+      title, category, imageUrl
+    );
+    
+    // For SQLite, lastID is returned. For PG wrapper, we return { lastID: row.id }
+    const id = result.lastID;
+    
+    res.json({ id, title, category, image_url: imageUrl });
+  } catch (error) {
+    console.error('Error in POST /api/masterpieces:', error);
+    res.status(500).json({ error: error.message, details: error });
   }
-  
-  const db = await getDb();
-  const result = await db.run(
-    'INSERT INTO masterpieces (title, category, image_url) VALUES (?, ?, ?) RETURNING id',
-    title, category, imageUrl
-  );
-  
-  // For SQLite, lastID is returned. For PG wrapper, we return { lastID: row.id }
-  const id = result.lastID;
-  
-  res.json({ id, title, category, image_url: imageUrl });
 });
 
 app.delete('/api/masterpieces/:id', async (req, res) => {
-  const db = await getDb();
-  await db.run('DELETE FROM masterpieces WHERE id = ?', req.params.id);
-  res.json({ success: true });
+  try {
+    const db = await getDb();
+    await db.run('DELETE FROM masterpieces WHERE id = ?', req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error in DELETE /api/masterpieces:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Packages
 app.get('/api/packages', async (req, res) => {
-  const db = await getDb();
-  const items = await db.all('SELECT * FROM packages');
-  // Parse features JSON if needed, but we store as text
-  res.json(items);
+  try {
+    const db = await getDb();
+    const items = await db.all('SELECT * FROM packages');
+    // Parse features JSON if needed, but we store as text
+    res.json(items);
+  } catch (error) {
+    console.error('Error in GET /api/packages:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.post('/api/packages', upload.single('image'), async (req, res) => {
-  console.log('Received package upload request');
-  console.log('Body:', req.body);
-  console.log('File:', req.file);
+  try {
+    console.log('Received package upload request');
+    console.log('Body:', req.body);
+    console.log('File:', req.file);
 
-  const { title, price, description, features } = req.body;
-  
-  let imageUrl = '';
-  if (req.file) {
-    imageUrl = req.file.path.startsWith('http') ? req.file.path : `/uploads/${req.file.filename}`;
+    const { title, price, description, features } = req.body;
+    
+    let imageUrl = '';
+    if (req.file) {
+      imageUrl = req.file.path.startsWith('http') ? req.file.path : `/uploads/${req.file.filename}`;
+    }
+    
+    const db = await getDb();
+    const result = await db.run(
+      'INSERT INTO packages (title, price, description, features, image_url) VALUES (?, ?, ?, ?, ?) RETURNING id',
+      title, price, description, features, imageUrl
+    );
+    
+    const id = result.lastID;
+    
+    res.json({ id, title, price, description, features, image_url: imageUrl });
+  } catch (error) {
+    console.error('Error in POST /api/packages:', error);
+    res.status(500).json({ error: error.message, details: error });
   }
-  
-  const db = await getDb();
-  const result = await db.run(
-    'INSERT INTO packages (title, price, description, features, image_url) VALUES (?, ?, ?, ?, ?) RETURNING id',
-    title, price, description, features, imageUrl
-  );
-  
-  const id = result.lastID;
-  
-  res.json({ id, title, price, description, features, image_url: imageUrl });
 });
 
 app.delete('/api/packages/:id', async (req, res) => {
-  const db = await getDb();
-  await db.run('DELETE FROM packages WHERE id = ?', req.params.id);
-  res.json({ success: true });
+  try {
+    const db = await getDb();
+    await db.run('DELETE FROM packages WHERE id = ?', req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error in DELETE /api/packages:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('Global Error Handler:', err);
+  res.status(500).json({ error: err.message, details: err });
 });
 
 app.listen(PORT, () => {

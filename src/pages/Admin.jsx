@@ -119,20 +119,41 @@ const MasterpiecesManager = () => {
     formData.append('category', category);
     if (image) formData.append('image', image);
 
-    await fetch(`${API_URL}/api/masterpieces`, {
-      method: 'POST',
-      body: formData,
-    });
-    setTitle('');
-    setCategory('');
-    setImage(null);
-    fetchItems();
+    try {
+      const res = await fetch(`${API_URL}/api/masterpieces`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to create masterpiece');
+      }
+
+      setTitle('');
+      setCategory('');
+      setImage(null);
+      fetchItems();
+      alert('Masterpiece added successfully!');
+    } catch (err) {
+      console.error(err);
+      alert(`Error: ${err.message}`);
+    }
   };
 
   const handleDelete = async (id) => {
     if (!confirm('Are you sure?')) return;
-    await fetch(`${API_URL}/api/masterpieces/${id}`, { method: 'DELETE' });
-    fetchItems();
+    try {
+      const res = await fetch(`${API_URL}/api/masterpieces/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to delete masterpiece');
+      }
+      fetchItems();
+    } catch (err) {
+      console.error(err);
+      alert(`Error: ${err.message}`);
+    }
   };
 
   return (
@@ -194,9 +215,14 @@ const PackagesManager = () => {
   const [image, setImage] = useState(null);
 
   const fetchItems = async () => {
-    const res = await fetch(`${API_URL}/api/packages`);
-    const data = await res.json();
-    setItems(data);
+    try {
+      const res = await fetch(`${API_URL}/api/packages`);
+      if (!res.ok) throw new Error('Failed to fetch packages');
+      const data = await res.json();
+      setItems(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
@@ -212,16 +238,28 @@ const PackagesManager = () => {
     formData.append('features', features);
     if (image) formData.append('image', image);
 
-    await fetch(`${API_URL}/api/packages`, {
-      method: 'POST',
-      body: formData,
-    });
-    setTitle('');
-    setPrice('');
-    setDescription('');
-    setFeatures('');
-    setImage(null);
-    fetchItems();
+    try {
+      const res = await fetch(`${API_URL}/api/packages`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to create package');
+      }
+
+      setTitle('');
+      setPrice('');
+      setDescription('');
+      setFeatures('');
+      setImage(null);
+      fetchItems();
+      alert('Package added successfully!');
+    } catch (err) {
+      console.error(err);
+      alert(`Error: ${err.message}`);
+    }
   };
 
   const handleDelete = async (id) => {
