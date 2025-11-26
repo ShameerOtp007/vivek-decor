@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../config';
-import { Check, X } from 'lucide-react';
+import { Check, X, Phone, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import birthdayImg from '../assets/images/birthday.png';
 import anniversaryImg from '../assets/images/anniversary.png';
@@ -27,7 +27,10 @@ const Packages = () => {
       })
       .catch(err => console.error('Failed to fetch packages:', err));
   }, []);
-
+  const handleWhatsApp = (pkgName) => {
+    const message = `Hi, I am interested in the ${pkgName} package. Please provide more details.`;
+    window.open(`https://wa.me/919207574633?text=${encodeURIComponent(message)}`, '_blank');
+  };
 
 
   return (
@@ -114,11 +117,30 @@ const Packages = () => {
                 <X size={32} />
               </button>
 
-              <img 
-                src={selectedPackage.image} 
-                alt={selectedPackage.name} 
-                className="w-full h-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
-              />
+              <div className="relative w-full h-full flex flex-col items-center">
+                <img 
+                  src={selectedPackage.image} 
+                  alt={selectedPackage.name} 
+                  className="w-full h-full max-h-[80vh] object-contain rounded-lg shadow-2xl mb-4"
+                />
+                
+                <div className="flex gap-4 w-full max-w-md">
+                  <a 
+                    href="tel:+919207574633"
+                    className="flex-1 btn-secondary flex items-center justify-center gap-2 py-3 bg-white text-gray-900 hover:bg-gray-100"
+                  >
+                    <Phone size={20} />
+                    Call Now
+                  </a>
+                  <button 
+                    onClick={() => handleWhatsApp(selectedPackage.name)}
+                    className="flex-1 btn-primary flex items-center justify-center gap-2 py-3"
+                  >
+                    <MessageCircle size={20} />
+                    WhatsApp
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}
