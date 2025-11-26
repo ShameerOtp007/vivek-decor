@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../config';
-import { MessageCircle, Check, Phone, X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import birthdayImg from '../assets/images/birthday.png';
 import anniversaryImg from '../assets/images/anniversary.png';
@@ -28,10 +28,7 @@ const Packages = () => {
       .catch(err => console.error('Failed to fetch packages:', err));
   }, []);
 
-  const handleWhatsApp = (pkgName) => {
-    const message = `Hi, I am interested in the ${pkgName} package. Please provide more details.`;
-    window.open(`https://wa.me/919207574633?text=${encodeURIComponent(message)}`, '_blank');
-  };
+
 
   return (
     <section id="packages" className="relative py-12 md:py-20">
@@ -101,66 +98,27 @@ const Packages = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedPackage(null)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl overflow-hidden max-w-lg w-full shadow-2xl relative"
+              className="relative max-w-6xl w-full max-h-[90vh] flex flex-col items-center justify-center"
             >
               <button
                 onClick={() => setSelectedPackage(null)}
-                className="absolute top-4 right-4 bg-white/50 hover:bg-white text-gray-800 rounded-full p-2 transition-colors z-10 backdrop-blur-md"
+                className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors p-2"
               >
-                <X size={20} />
+                <X size={32} />
               </button>
 
-              <div className="h-64 relative">
-                <img 
-                  src={selectedPackage.image} 
-                  alt={selectedPackage.name} 
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                  <div>
-                    <h3 className="text-3xl text-white font-heading mb-1">{selectedPackage.name}</h3>
-                    <p className="text-2xl text-primary font-bold">{selectedPackage.price}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6">
-                <h4 className="text-lg font-bold text-gray-900 mb-4">Package Includes:</h4>
-                <ul className="space-y-3 mb-8">
-                  {selectedPackage.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-gray-600">
-                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 mt-0.5">
-                        <Check size={12} />
-                      </div>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <a 
-                    href="tel:+919207574633"
-                    className="flex-1 btn-secondary flex items-center justify-center gap-2 py-3"
-                  >
-                    <Phone size={18} />
-                    Call Now
-                  </a>
-                  <button 
-                    onClick={() => handleWhatsApp(selectedPackage.name)}
-                    className="flex-1 btn-primary flex items-center justify-center gap-2 py-3"
-                  >
-                    <MessageCircle size={18} />
-                    WhatsApp
-                  </button>
-                </div>
-              </div>
+              <img 
+                src={selectedPackage.image} 
+                alt={selectedPackage.name} 
+                className="w-full h-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+              />
             </motion.div>
           </motion.div>
         )}
